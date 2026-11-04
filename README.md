@@ -37,7 +37,13 @@ You should see "Success. No rows returned".
 New query → paste all of `supabase/seed.sql` → **Run**.
 Check in **Table Editor**: `questions` has 20 rows, `career_fields` has 5.
 
-### 5. Deploy the AI function
+### 5. Deploy the function
+> **Already done** for project `pathfinder-ai` (ref `cwlneejdcuuilfuwrfqz`, Frankfurt), deployed with
+> "Verify JWT" **off** because the function checks the login token itself.
+> The **AI part is optional** and handled by another team member: without `GEMINI_API_KEY` the function
+> still returns scores, skill gaps and ready-made explanation/roadmap text (`"ai_used": false`).
+> To turn AI on later, only step 1–2 below are needed; no code change.
+
 1. Get a free Gemini key: https://aistudio.google.com/apikey → **Create API key**.
 2. **Edge Functions → Secrets** → add `GEMINI_API_KEY` = your key.
    (Optional: `GEMINI_MODEL`, default is `gemini-flash-latest`.)
