@@ -1,0 +1,19 @@
+flowchart LR
+    browser["User's browser"]
+    site["Frontend hosting<br/>HTML, CSS, JS<br/>+ public anon key"]
+    subgraph Supa["Supabase project pathfinder-ai (eu-central-1)"]
+        direction TB
+        api["Supabase API gateway<br/>Auth, REST, Functions"]
+        fn["Edge Function<br/>analyze-profile"]
+        sec["Secrets<br/>GEMINI_API_KEY, GEMINI_MODEL"]
+        pg[("PostgreSQL")]
+        api --> fn
+        api --> pg
+        sec -.-> fn
+        fn --> pg
+    end
+    google["Google Gemini API"]
+
+    browser -- "1. load site" --> site
+    browser -- "2. HTTPS calls" --> api
+    fn -. "HTTPS" .-> google

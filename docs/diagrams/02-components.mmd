@@ -1,0 +1,17 @@
+flowchart TB
+    fe["Frontend (supabase-js)"]
+    h["index.ts: HTTP handler<br/>CORS, auth check, load data, save result"]
+    s["scoring.ts: pure logic<br/>validation, scores, ranking, skill gaps, fallback"]
+    g["Gemini helpers<br/>classifyCurious(), personalize()"]
+    gem["Google Gemini API"]
+    content[("Content tables<br/>sections, questions, question_options,<br/>career_fields, careers,<br/>work_environments, field_skills")]
+    user[("User tables<br/>profiles, answers")]
+    out[("Output tables<br/>results, result_details")]
+
+    fe -- "POST + JWT" --> h
+    h --> s
+    h --> g
+    g -. "25 s timeout" .-> gem
+    h -- "read" --> content
+    h -- "read" --> user
+    h -- "insert" --> out

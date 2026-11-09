@@ -1,0 +1,40 @@
+sequenceDiagram
+    autonumber
+    actor U as Student
+    participant FE as Frontend
+    participant EF as analyze-profile
+    participant A as Supabase Auth
+    participant DB as PostgreSQL
+    participant G as Gemini (optional)
+
+    U->>FE: Click "See results"
+    FE->>FE: Show "Analyzing your profile..."
+    FE->>EF: POST /functions/v1/analyze-profile<br/>Authorization: Bearer JWT
+    EF->>A: getUser(JWT)
+    alt invalid / missing token
+        EF-->>FE: 401 {"error":"Not logged in"}
+    end
+    par load in parallel
+        EF->>DB: questions, question_options, career_fields
+    and
+        EF->>DB: field_skills, careers, answers (this user)
+    end
+    EF->>EF: findMissingAnswers()
+    alt required answers missing
+        EF-->>FE: 400 {missing_questions:[...]}
+    end
+    opt Q20 text given
+        EF->>G: classify sentence → field code
+        G-->>EF: {"field":"data"} or null
+    end
+    EF->>EF: computeScores() → rankFields() → top 3<br/>estimateSkillGaps() for top 3
+    EF->>G: personalize(answers, top 3 + gaps)
+    alt AI ok
+        G-->>EF: explanation + 6/9/12-month roadmap
+    else no key / timeout / bad JSON
+        G-->>EF: null → field description + fallbackRoadmap()
+    end
+    EF->>DB: insert results (scores, top_fields, ai_used)
+    EF->>DB: insert result_details × 3
+    EF-->>FE: 200 {result_id, share_id, scores[5], top_matches[3]}
+    FE-->>U: Results page (radar chart, top 3 cards)

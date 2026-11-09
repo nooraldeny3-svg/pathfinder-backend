@@ -1,0 +1,22 @@
+sequenceDiagram
+    autonumber
+    actor U as Student
+    participant FE as Frontend
+    participant A as Supabase Auth
+    participant R as PostgREST
+    participant DB as PostgreSQL
+
+    U->>FE: Fill "Create your account"
+    FE->>A: auth.signUp(email, password, {full_name})
+    A->>DB: insert auth.users
+    DB->>DB: trigger handle_new_user() → insert profiles
+    A-->>FE: session (JWT)
+    FE->>R: select sections, questions + question_options
+    R->>DB: SELECT
+    R-->>FE: 4 sections, 20 questions with options
+    loop Each "Next" (Q1 to Q20)
+        U->>FE: Answer question
+        FE->>R: upsert answers (user_id, question_id, value)<br/>onConflict user_id,question_id
+        R->>DB: INSERT ... ON CONFLICT DO UPDATE
+    end
+    Note over FE,DB: "Back" / continue later → select answers where user_id = me

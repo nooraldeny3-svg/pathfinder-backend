@@ -1,0 +1,22 @@
+flowchart LR
+    student(["Student / Graduate<br/>(web browser)"])
+    subgraph FE["Frontend (Member 2)<br/>HTML · CSS · JS + supabase-js"]
+        ui["Pages: Landing · Sign up · Log in ·<br/>Questionnaire · Analyzing · Results ·<br/>Details · Share · My results"]
+    end
+    subgraph SB["Supabase Cloud: project pathfinder-ai (Frankfurt)"]
+        auth["Supabase Auth<br/>(email + password, JWT)"]
+        rest["PostgREST<br/>auto REST API"]
+        edge["Edge Function<br/>analyze-profile (Deno)"]
+        db[("PostgreSQL<br/>11 tables")]
+    end
+    gemini["Google Gemini API<br/>(optional AI)"]
+
+    student --> ui
+    ui -- "signUp / signIn" --> auth
+    ui -- "read questions,<br/>save answers,<br/>read results" --> rest
+    ui -- "POST analyze-profile<br/>(Bearer JWT)" --> edge
+    auth -- "trigger creates profile" --> db
+    rest --> db
+    edge -- "verify JWT" --> auth
+    edge -- "service_role<br/>read + write" --> db
+    edge -. "Q20 classify +<br/>explanation / roadmap" .-> gemini

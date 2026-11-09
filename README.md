@@ -15,7 +15,10 @@ pathfinder-backend/
 │   │   ├── index.ts                           ← the AI function
 │   │   └── scoring.ts                         ← score / skill-gap calculations
 │   └── tests/test_answers.sql                 ← fake answers for testing
-├── docs/API.md                                ← how the frontend uses the backend
+├── docs/
+│   ├── API.md                                 ← how the frontend uses the backend
+│   ├── ARCHITECTURE.md                        ← system architecture, schema, API contracts
+│   └── diagrams/                              ← architecture / ER / sequence diagrams (.mmd, .svg, .png)
 └── README.md
 ```
 

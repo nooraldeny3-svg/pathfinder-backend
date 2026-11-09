@@ -1,0 +1,103 @@
+erDiagram
+    AUTH_USERS ||--|| PROFILES : "has (trigger)"
+    AUTH_USERS ||--o{ ANSWERS : gives
+    AUTH_USERS ||--o{ RESULTS : owns
+    SECTIONS ||--|{ QUESTIONS : groups
+    QUESTIONS ||--o{ QUESTION_OPTIONS : offers
+    QUESTIONS ||--o{ ANSWERS : "answered in"
+    CAREER_FIELDS ||--o{ CAREERS : lists
+    CAREER_FIELDS ||--o{ WORK_ENVIRONMENTS : lists
+    CAREER_FIELDS ||--|{ FIELD_SKILLS : "key skills"
+    CAREER_FIELDS |o--o{ QUESTIONS : "interest (Q5-Q14)"
+    CAREER_FIELDS |o--o{ QUESTION_OPTIONS : "points to"
+    RESULTS ||--|{ RESULT_DETAILS : "top 3"
+    CAREER_FIELDS ||--o{ RESULT_DETAILS : "described by"
+
+    AUTH_USERS {
+        uuid id PK
+        text email
+    }
+    PROFILES {
+        uuid id PK, FK
+        text full_name
+        text email
+        timestamptz created_at
+    }
+    SECTIONS {
+        smallint id PK
+        text title
+        text description
+        int sort_order
+    }
+    QUESTIONS {
+        smallint id PK "1..20"
+        smallint section_id FK
+        text code UK
+        text title
+        text type "8 types"
+        text field_code FK "nullable"
+        boolean required
+        jsonb settings
+    }
+    QUESTION_OPTIONS {
+        serial id PK
+        smallint question_id FK
+        text code "UK with question_id"
+        text label
+        text field_code FK "nullable"
+        int sort_order
+    }
+    ANSWERS {
+        uuid user_id PK, FK
+        smallint question_id PK, FK
+        jsonb value
+        timestamptz updated_at
+    }
+    CAREER_FIELDS {
+        text code PK "data|creative|people|tech|business"
+        text name
+        text short_label
+        text description
+        text q3_skill
+        int sort_order
+    }
+    CAREERS {
+        serial id PK
+        text field_code FK
+        text title
+        int sort_order
+    }
+    WORK_ENVIRONMENTS {
+        serial id PK
+        text field_code FK
+        text name
+        int sort_order
+    }
+    FIELD_SKILLS {
+        serial id PK
+        text field_code FK
+        text name
+        text base_skill
+        int target "default 80"
+        int sort_order
+    }
+    RESULTS {
+        uuid id PK
+        uuid user_id FK
+        jsonb scores
+        text_array top_fields
+        boolean is_saved
+        uuid share_id UK
+        boolean ai_used
+        timestamptz created_at
+    }
+    RESULT_DETAILS {
+        serial id PK
+        uuid result_id FK
+        text field_code FK
+        int rank "1..3"
+        int match_percent
+        text explanation
+        jsonb skill_gaps
+        jsonb roadmap
+    }

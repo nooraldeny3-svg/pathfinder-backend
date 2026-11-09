@@ -1,0 +1,20 @@
+sequenceDiagram
+    autonumber
+    actor U as Student
+    actor V as Visitor
+    participant FE as Frontend
+    participant R as PostgREST
+
+    U->>FE: "View details" (field X)
+    FE->>R: career_fields(code=X) + careers + work_environments
+    FE->>R: result_details(result_id, field_code=X)
+    R-->>FE: careers, environments, explanation, gaps, roadmap
+    U->>FE: "Save results"
+    FE->>R: update results set is_saved=true where id=result_id
+    U->>FE: "Share"
+    FE-->>U: link /share/{share_id}
+    V->>FE: open /share/{share_id}
+    FE->>R: results(share_id) + result_details(*)
+    R-->>FE: read-only result
+    U->>FE: "My results"
+    FE->>R: results where user_id=me order by created_at desc
