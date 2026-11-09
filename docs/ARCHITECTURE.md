@@ -3,7 +3,7 @@
 | | |
 |---|---|
 | **Document** | System architecture, database schema and API integration |
-| **Role** | System Architect (Member 5) |
+| **Prepared by** | Şilan Aybek, System Architect (Member 5) |
 | **Version** | 1.0 |
 | **Date** | 9 November 2026 |
 | **Related files** | `README.md` (setup), `docs/API.md` (frontend usage), `docs/diagrams/` (all diagrams) |
