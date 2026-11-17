@@ -1,12 +1,12 @@
 flowchart LR
     browser["User's browser"]
-    site["Frontend hosting<br/>HTML, CSS, JS<br/>+ public anon key"]
+    site["Frontend hosting<br/>React build (Vite)<br/>+ public anon key"]
     subgraph Supa["Supabase project pathfinder-ai (eu-central-1)"]
         direction TB
         api["Supabase API gateway<br/>Auth, REST, Functions"]
         fn["Edge Function<br/>analyze-profile"]
         sec["Secrets<br/>GEMINI_API_KEY, GEMINI_MODEL"]
-        pg[("PostgreSQL")]
+        pg[("Supabase Postgres")]
         api --> fn
         api --> pg
         sec -.-> fn
