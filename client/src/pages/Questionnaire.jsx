@@ -11,7 +11,9 @@ export default function Questionnaire() {
   const n = Number(useParams().number);
 
   const [data, setData] = useState(null); // { sections, questions, answers }
-  const [draft, setDraft] = useState(null);
+  // The answer being edited, remembered together with the question it belongs to.
+  // (Storing the question id prevents showing question 3's answer on question 4.)
+  const [draft, setDraftState] = useState({ qid: null, value: null });
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
 
@@ -22,12 +24,11 @@ export default function Questionnaire() {
 
   const q = data?.questions.find((x) => x.id === n);
 
-  // When the question changes, show the saved answer (if any).
+  // Moving to another question: clear the error and any unsaved change.
   useEffect(() => {
-    if (!q) return;
     setError('');
-    setDraft(data.answers[q.id] !== undefined && data.answers[q.id] !== null ? data.answers[q.id] : emptyValue(q));
-  }, [q?.id, data]);
+    setDraftState({ qid: null, value: null });
+  }, [n]);
 
   if (error && !data) return <div className="container"><p className="error">{error}</p></div>;
   if (!data) return <div className="container"><p>Loading…</p></div>;
@@ -37,6 +38,11 @@ export default function Questionnaire() {
   const total = questions.length;
   const isLast = n === total;
   const section = sections.find((s) => s.id === q.section_id);
+
+  // Current answer: what the user changed on THIS question, otherwise the saved answer, otherwise empty.
+  const saved = answers[q.id];
+  const value = draft.qid === q.id ? draft.value : saved !== undefined && saved !== null ? saved : emptyValue(q);
+  const setDraft = (v) => setDraftState({ qid: q.id, value: v });
 
   const save = async (value) => {
     setBusy(true);
@@ -53,7 +59,7 @@ export default function Questionnaire() {
   };
 
   const handleNext = () => {
-    if (!isComplete(q, draft)) {
+    if (!isComplete(q, value)) {
       setError(q.type === 'most_least'
         ? 'Pick at least one MOST and one LEAST.'
         : q.type === 'ranking'
@@ -61,8 +67,7 @@ export default function Questionnaire() {
           : 'Please answer this question first.');
       return;
     }
-    const value = q.type === 'text' ? (draft || '').trim() || null : draft;
-    save(value);
+    save(q.type === 'text' ? (value || '').trim() || null : value);
   };
 
   const handleBack = () => navigate(n > 1 ? `/questionnaire/${n - 1}` : '/start');
@@ -94,7 +99,7 @@ export default function Questionnaire() {
         <h1>{q.title}</h1>
         {q.subtitle && <p className="muted">{q.subtitle}</p>}
 
-        <QuestionInput q={q} value={draft} onChange={(v) => { setDraft(v); setError(''); }} />
+        <QuestionInput q={q} value={value} onChange={(v) => { setDraft(v); setError(''); }} />
 
         {q.type === 'text' && (
           <button type="button" className="link skip" disabled={busy} onClick={() => save(null)}>Skip</button>

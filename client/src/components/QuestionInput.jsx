@@ -4,10 +4,14 @@
 
 const SCALE = [1, 2, 3, 4, 5];
 
+// Safety: always work with the right shape, even if an unexpected value arrives.
+const asArray = (v) => (Array.isArray(v) ? v : []);
+const asObject = (v) => (v && typeof v === 'object' && !Array.isArray(v) ? v : {});
+
 function Dropdown({ q, value, onChange }) {
   const placeholder = q.code === 'study_field' ? 'Choose your field of study' : 'Choose an option';
   return (
-    <select value={value || ''} onChange={(e) => onChange(e.target.value || null)}>
+    <select value={typeof value === 'string' ? value : ''} onChange={(e) => onChange(e.target.value || null)}>
       <option value="">{placeholder}</option>
       {q.options.map((o) => <option key={o.code} value={o.code}>{o.label}</option>)}
     </select>
@@ -53,7 +57,7 @@ function ScaleButtons({ value, onChange, label }) {
 }
 
 function RatingGrid({ q, value, onChange }) {
-  const v = value || {};
+  const v = asObject(value);
   return (
     <div className="options">
       {q.options.map((o) => (
@@ -67,7 +71,7 @@ function RatingGrid({ q, value, onChange }) {
 }
 
 function MultiSelect({ q, value, onChange }) {
-  const v = value || [];
+  const v = asArray(value);
   const toggle = (code) => onChange(v.includes(code) ? v.filter((c) => c !== code) : [...v, code]);
   return (
     <div className="options two-col">
@@ -88,6 +92,7 @@ function MultiSelect({ q, value, onChange }) {
 }
 
 function Scale({ q, value, onChange }) {
+  value = typeof value === 'number' ? value : null;
   return (
     <div className="option static scale-card">
       <ScaleButtons label={q.title} value={value} onChange={onChange} />
@@ -100,9 +105,9 @@ function Scale({ q, value, onChange }) {
 }
 
 function MostLeast({ q, value, onChange }) {
-  const v = value || { most: [], least: [] };
-  const most = v.most || [];
-  const least = v.least || [];
+  const v = asObject(value);
+  const most = asArray(v.most);
+  const least = asArray(v.least);
   // A statement can't be both MOST and LEAST.
   const setMost = (code) => onChange({
     most: most.includes(code) ? most.filter((c) => c !== code) : [...most, code],
@@ -129,7 +134,7 @@ function MostLeast({ q, value, onChange }) {
 }
 
 function Ranking({ q, value, onChange }) {
-  const v = value || [];
+  const v = asArray(value);
   const count = q.settings?.count || 3;
   const click = (code) => {
     if (v.includes(code)) onChange(v.filter((c) => c !== code));
@@ -163,7 +168,7 @@ function TextAnswer({ q, value, onChange }) {
       rows={4}
       maxLength={q.settings?.max_length || 300}
       placeholder="Type one sentence (optional)"
-      value={value || ''}
+      value={typeof value === 'string' ? value : ''}
       onChange={(e) => onChange(e.target.value)}
     />
   );
