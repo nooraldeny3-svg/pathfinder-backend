@@ -1,8 +1,10 @@
+import { Navigate } from 'react-router-dom';
 import { useAuth } from '../AuthContext.jsx';
 import AuthForm from '../components/AuthForm.jsx';
 
 export default function Login() {
-  const { login } = useAuth();
+  const { user, login } = useAuth();
+  if (user) return <Navigate to="/start" replace />;
   return (
     <AuthForm
       title="Log in"

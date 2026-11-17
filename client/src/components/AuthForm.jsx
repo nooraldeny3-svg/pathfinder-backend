@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 
-export default function AuthForm({ title, fields, submitLabel, onSubmit, footer }) {
+export default function AuthForm({ title, fields, submitLabel, onSubmit, footer, redirectTo = '/start' }) {
   const navigate = useNavigate();
   const [values, setValues] = useState(Object.fromEntries(fields.map((f) => [f.name, ''])));
   const [error, setError] = useState('');
@@ -13,7 +13,7 @@ export default function AuthForm({ title, fields, submitLabel, onSubmit, footer 
     setBusy(true);
     try {
       await onSubmit(values);
-      navigate('/assessment');
+      navigate(redirectTo);
     } catch (err) {
       setError(err.message);
     } finally {
@@ -33,6 +33,7 @@ export default function AuthForm({ title, fields, submitLabel, onSubmit, footer 
               required
               minLength={f.minLength}
               autoComplete={f.autoComplete}
+              placeholder={f.label}
               value={values[f.name]}
               onChange={(e) => setValues({ ...values, [f.name]: e.target.value })}
             />

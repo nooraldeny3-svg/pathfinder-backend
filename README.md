@@ -83,6 +83,11 @@ Never share the service_role / secret key.
 
 ---
 
+## Frontend
+
+The website is in [`client/`](client/README.md) (React + Vite) and is connected directly to Supabase.
+Run it with `cd client && npm install && npm run dev`.
+
 ## How the matching works
 
 The 20 questions are built around **5 career fields**:
