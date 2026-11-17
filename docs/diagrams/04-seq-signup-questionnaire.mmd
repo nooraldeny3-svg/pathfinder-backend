@@ -4,7 +4,7 @@ sequenceDiagram
     participant FE as Frontend
     participant A as Supabase Auth
     participant R as PostgREST
-    participant DB as PostgreSQL
+    participant DB as Supabase Postgres
 
     U->>FE: Fill "Create your account"
     FE->>A: auth.signUp(email, password, {full_name})
